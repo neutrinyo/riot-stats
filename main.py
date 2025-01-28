@@ -1,23 +1,22 @@
-import argparse
 import re
 
-def parse_username(username: str) -> str:
-    user_match = re.match('^[a-zA-Z0-9]{3,16}#[a-zA-Z0-9]{3,5}$', username)
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
 
-    if user_match:
-        game_name, tag_line = user_match.string.split("#")
-        return game_name, tag_line
+from src.routes.matches.main import router
+from src.util.riot_client import client
 
-    raise ValueError("Provided username is invalid - please refer to Riot ID guidelines for details.")
 
-parser = argparse.ArgumentParser(
-    prog='riot_stats',
-    description='Statistical and visual analysis of League of Legends match/player data.'
-)
+# create lifespan function
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with client:
+        yield
 
-parser.add_argument('-u', '--user')
-parser.add_argument('-d', '--data')
+# init the app itself using the lifespan, include routers, create main route
+app = FastAPI(lifespan=lifespan)
+app.include_router(router)
 
-args = parser.parse_args()
-name, tag = parse_username(args.user)
-print(name, tag)
+@app.get("/")
+def main_function():
+    return {"Hello": "World"}
