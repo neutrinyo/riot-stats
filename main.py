@@ -19,4 +19,4 @@ app.include_router(users.router)
 
 @app.get("/")
 def main_function():
-    return "Available main endpoints: /matches"
+    return "Available main endpoints: /matches, /users"

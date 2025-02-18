@@ -1,11 +1,12 @@
 # |----------------------------------------------------OUTSIDE IMPORTS--------------------------------------------------|
+
 from fastapi import APIRouter
 from pulsefire.schemas import RiotAPISchema
 
 # |-----------------------------------------------------IN-APP IMPORTS--------------------------------------------------|
-from src.util.riot_client import client
-from .controller import parse_username
 
+import src.routes.users.controller as controller
+from src.util.riot_client import client
 
 # |------------------------------------------------REQUEST/RESPONSE BODIES----------------------------------------------|
 
@@ -14,10 +15,9 @@ from .controller import parse_username
 # |----------------------------------------------------GLOBAL METHODS---------------------------------------------------|
 
 async def fetch_user_data(region: str = "europe", names: list = "") -> RiotAPISchema.AccountV1Account:
-    game_name, tag_line = parse_username(names)
+    game_name, tag_line = controller.parse_username(names)
     account = await client.get_account_v1_by_riot_id(region=region, game_name=game_name, tag_line=tag_line)
     return account
-
 
 # |----------------------------------------------------- ENDPOINTS -----------------------------------------------------|
 
